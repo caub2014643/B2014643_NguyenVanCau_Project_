@@ -12,5 +12,5 @@ router.route("/:id")
     .get(muonsach.findOne)
     .put(muonsach.update)
     .delete(muonsach.delete);
-
+router.route("/lichsu").post(muonsach.getAllReader);
 module.exports = router;

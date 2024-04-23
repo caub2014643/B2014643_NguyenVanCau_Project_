@@ -40,7 +40,7 @@ exports.findAll = async (req, res, next) => {
 exports.findOne = async (req, res, next) => {
     try {
         const docgiaService = new DocGiaService(MongoDB.client);
-        const document = await docgiaService.findById(req.params.id);
+        const document = await docgiaService.findById(req.params.madocgia);
         if (!document) {
             return next(new ApiError(404, "Không tìm thấy đọc giả!"));
         }
@@ -49,7 +49,7 @@ exports.findOne = async (req, res, next) => {
         return next(
             new ApiError(
                 500,
-                `Lỗi khi truy xuất đọc giả với id= ${req.params.id}`
+                `Lỗi khi truy xuất đọc giả với id= ${req.params.madocgia}`
             )
         );
     }
@@ -102,6 +102,26 @@ exports.deleteAll = async (_req, res, next) => {
     } catch (error) {
         return next(
             new ApiError(500, "Đã xảy ra lỗi khi xóa tất cả đọc giả!")
+        );
+    }
+};
+
+exports.login = async (req, res, next) => {
+    const { madocgia, dienthoai } = req.body;
+
+    try {
+        const docgiaService = new DocGiaService(MongoDB.client);
+        const result = await docgiaService.login(madocgia, dienthoai);
+
+        if (!result) {
+            // Trường hợp xác thực không thành công, trả về lỗi
+            return next(new ApiError(401, result.message));
+        }
+
+        return res.send(result.docGia);
+    } catch (error) {
+        return next(
+            new ApiError(500, "Đã xảy ra lỗi khi xác thực người dùng!")
         );
     }
 };

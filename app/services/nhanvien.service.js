@@ -70,10 +70,26 @@ class NhanVienService {
         return result;
     }
 
-    async deleteAll() {
-        const result = await this.NhanVien.deleteMany({});
-        return result.deletedCount;
+    async login(sodienthoai, password) {
+        // Tìm nhân viên dựa trên số điện thoại
+        const nhanVien = await this.NhanVien.findOne({ sodienthoai });
+        // Kiểm tra xem nhân viên có tồn tại không
+        if (!nhanVien) {
+            return { success: false, message: "Người dùng không tồn tại" };
+        }
+        // Kiểm tra mật khẩu
+        if (nhanVien.password != password) {
+            return { success: false, message: "Mật khẩu không đúng" };
+        }
+        // Trả về thông tin nhân viên nếu xác thực thành công
+        return { success: true, nhanVien };
     }
+    async getMaNV() {
+        const chucVu = "nhanvien";
+        const result = await this.NhanVien.finOneCV(chucVu);
+        return result.msnv;
+    }
+    
 }
 
 module.exports = NhanVienService;

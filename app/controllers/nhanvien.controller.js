@@ -7,8 +7,8 @@ exports.create = async (req, res, next) => {
         return next(new ApiError(400, "Mã số nhân viên không được để trống!"));
     }
     try {
-        const bookService = new NhanVienService(MongoDB.client);
-        const document = await bookService.create(req.body);
+        const nhanvienService = new NhanVienService(MongoDB.client);
+        const document = await nhanvienService.create(req.body);
         return res.send(document);
     } catch (error) {
         return next(
@@ -21,12 +21,12 @@ exports.findAll = async (req, res, next) => {
     let documents = [];
     
     try {
-        const bookService = new NhanVienService(MongoDB.client);
+        const nhanvienService = new NhanVienService(MongoDB.client);
         const { hotennv } = req.query;
         if (hotennv) {
-            documents = await bookService.findByName(hotennv);
+            documents = await nhanvienService.findByName(hotennv);
         } else {
-            documents = await bookService.find({});
+            documents = await nhanvienService.find({});
         }
     } catch (error) {
         return next(
@@ -39,8 +39,8 @@ exports.findAll = async (req, res, next) => {
 
 exports.findOne = async (req, res, next) => {
     try {
-        const bookService = new NhanVienService(MongoDB.client);
-        const document = await bookService.findById(req.params.id);
+        const nhanvienService = new NhanVienService(MongoDB.client);
+        const document = await nhanvienService.findById(req.params.sodienthoai);
         if (!document) {
             return next(new ApiError(404, "Không tìm thấy nhân viên!"));
         }
@@ -49,20 +49,36 @@ exports.findOne = async (req, res, next) => {
         return next(
             new ApiError(
                 500,
-                `Lỗi khi truy xuất nhân viên với id= ${req.params.id}`
+                `Lỗi khi truy xuất nhân viên với id= ${req.params.sodienthoai}`
             )
         );
     }
 };
-
+exports.findOneCV = async (req, res, next) => {
+    try {
+        const nhanvienService = new NhanVienService(MongoDB.client);
+        const document = await nhanvienService.findById(req.params.chucvu);
+        if (!document) {
+            return next(new ApiError(404, "Không tìm thấy nhân viên!"));
+        }
+        return res.send(document);
+    } catch (error) {
+        return next(
+            new ApiError(
+                500,
+                `Lỗi khi truy xuất nhân viên với id= ${req.params.chucvu}`
+            )
+        );
+    }
+};
 exports.update = async (req, res, next) => {
     if (!req.params.id) {
         return next(new ApiError(400, "Mã số nhân viên không được để trống!"));
     }
     
     try {
-        const bookService = new NhanVienService(MongoDB.client);
-        const document = await bookService.update(req.params.id, req.body);
+        const nhanvienService = new NhanVienService(MongoDB.client);
+        const document = await nhanvienService.update(req.params.id, req.body);
         if (!document) {
             return next(new ApiError(404, "Không tìm thấy nhân viên!"));
         }
@@ -76,8 +92,8 @@ exports.update = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
     try {
-        const bookService = new NhanVienService(MongoDB.client);
-        const document = await bookService.delete(req.params.id);
+        const nhanvienService = new NhanVienService(MongoDB.client);
+        const document = await nhanvienService.delete(req.params.id);
         if (!document) {
             return next(new ApiError(404, "Không tìm thấy nhân viên!"));
         }
@@ -92,16 +108,43 @@ exports.delete = async (req, res, next) => {
     }
 };
 
-exports.deleteAll = async (_req, res, next) => {
+exports.login = async (req, res, next) => {
+    const { sodienthoai, password } = req.body;
+
     try {
-        const bookService = new NhanVienService(MongoDB.client);
-        const deletedCount = await bookService.deleteAll();
-        return res.send({
-            message: `${deletedCount} nhân viên đã được xóa thành công!`,
-        });
+        const nhanvienService = new NhanVienService(MongoDB.client);
+        const result = await nhanvienService.login(sodienthoai, password);
+
+        if (!result.success) {
+            // Trường hợp xác thực không thành công, trả về lỗi
+            return next(new ApiError(401, result.message));
+        }
+
+        // Trường hợp xác thực thành công, trả về thông tin nhân viên
+        return res.send(result.nhanVien);
     } catch (error) {
         return next(
-            new ApiError(500, "Đã xảy ra lỗi khi xóa tất cả nhân viên!")
+            new ApiError(500, "Đã xảy ra lỗi khi xác thực người dùng!")
         );
     }
 };
+
+exports.getMaNV = async (req, res, next) => {
+    
+    try {
+        const nhanvienService = new NhanVienService(MongoDB.client);
+        const result = await nhanvienService.getMaNV();
+
+        if (!result.success) {
+            // Trường hợp xác thực không thành công, trả về lỗi
+            return next(new ApiError(401, result.message));
+        }
+
+        // Trường hợp xác thực thành công, trả về thông tin nhân viên
+        return res.send(result);
+    } catch (error) {
+        
+    }
+};
+
+

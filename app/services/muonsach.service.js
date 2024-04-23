@@ -36,7 +36,7 @@ class MuonSachService {
 
     async findByName(name) {
         return await this.find({
-            tendocgia: { $regex: new RegExp(name), $options: "i" },
+            madocgia: { $regex: new RegExp(name), $options: "i" },
         });
     }
 

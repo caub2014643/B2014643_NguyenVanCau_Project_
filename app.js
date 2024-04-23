@@ -39,5 +39,4 @@ app.use((err, req, res, next) => {
         message: err.message || "Lỗi máy chủ nội bộ",
     });
 });
-
 module.exports = app;

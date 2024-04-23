@@ -6,8 +6,7 @@ const router = express.Router();
 router.route("/")
     .get(nhanvien.findAll)
     .post(nhanvien.create)
-    .delete(nhanvien.deleteAll);
-
+router.route("/login").post(nhanvien.login)
 router.route("/:id")
     .get(nhanvien.findOne)
     .put(nhanvien.update)

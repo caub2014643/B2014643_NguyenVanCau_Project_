@@ -42,7 +42,25 @@ exports.findAll = async (req, res, next) => {
 
     return res.send(documents);
 };
+exports.getAllReader = async (req, res, next) => {
+    let documents = [];
+    
+    try {
+        const muonsachService = new MuonSachService(MongoDB.client);
+        const { madocgia } = req.query;
+        if (madocgia) {
+            documents = await muonsachService.findByName(madocgia);
+        } else {
+            documents = await muonsachService.find({});
+        }
+    } catch (error) {
+        return next(
+            new ApiError(500, "Đã xảy ra lỗi khi truy xuất danh sách theo dõi mượn sách!")
+        );
+    }
 
+    return res.send(documents);
+};
 exports.findOne = async (req, res, next) => {
     try {
         const muonsachService = new MuonSachService(MongoDB.client);

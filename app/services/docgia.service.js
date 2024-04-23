@@ -39,7 +39,7 @@ class DocGiaService {
 
     async findByName(name) {
         return await this.find({
-            ten: { $regex: new RegExp(name), $options: "i" },
+            madocgia: { $regex: new RegExp(name), $options: "i" },
         });
     }
 
@@ -74,6 +74,20 @@ class DocGiaService {
     async deleteAll() {
         const result = await this.DocGia.deleteMany({});
         return result.deletedCount;
+    }
+    async login(madocgia, dienthoai) {
+        // Tìm nhân viên dựa trên số điện thoại
+        const docGia = await this.DocGia.findOne({ madocgia });
+        // Kiểm tra xem nhân viên có tồn tại không
+        if (!docGia) {
+            return { success: false, message: "Người dùng không tồn tại" };
+        }
+        // Kiểm tra mật khẩu
+        if (docGia.dienthoai !== dienthoai) {
+            return { success: false, message: "Mật khẩu không đúng" };
+        }
+        // Trả về thông tin nhân viên nếu xác thực thành công
+        return { success: true, docGia };
     }
 }
 
